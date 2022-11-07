@@ -12,12 +12,12 @@ func main{output_ptr : felt*}():
     serialize_word(p) // it returns 0 at this code because,
                     //it happens because in a modular arithmetic (circle of numbers) the largest number ends at the same point that the initial number (0) starts
 
-    # serialize_word(half_p - 2)
-    # serialize_word(half_p - 1)
-    # serialize_word(half_p)
-    # serialize_word(half_p + 1)
-    # serialize_word(half_p + 2)
-    # serialize_word(half_p + 3)
+    serialize_word(half_p - 2)
+    serialize_word(half_p - 1)
+    serialize_word(half_p)
+    serialize_word(half_p + 1)
+    serialize_word(half_p + 2)
+    serialize_word(half_p + 3)
 
     serialize_word(1 / 2) // it returns the largest negative number, 
         //it makes sense because in a modular arithmetic (circle of numbers) reading the number back it starts with -1,
