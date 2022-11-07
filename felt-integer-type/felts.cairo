@@ -1,3 +1,5 @@
+// code from https://www.youtube.com/watch?v=jcrAq71WwSM&lc=Ugwl_ykvDPkHBTDVlAp4AaABAg
+
 %builtins output
 
 from starkware.cairo.common.serialize import serialize_word
