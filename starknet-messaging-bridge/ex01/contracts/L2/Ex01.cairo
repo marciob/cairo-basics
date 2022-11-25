@@ -20,11 +20,11 @@ func create_l1_nft_message{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range
     l1_user : felt
 ) {
     // creating payload
-    let (message_payload: felt*) = alloc();
-    assert message_payload[0] = l1_user;
+    let (message_payload_: felt*) = alloc();
+    assert message_payload_[0] = l1_user;
 
     // sending the message
-    send_message_to_l1(to_address=l1_contract_address, payload_size=1, payload=message_payload);
+    send_message_to_l1(to_address=l1_contract_address, payload_size=1, payload=message_payload_);
 
     return ();
 }

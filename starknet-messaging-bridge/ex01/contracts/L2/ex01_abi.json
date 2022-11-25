@@ -1,0 +1,13 @@
+[
+    {
+        "inputs": [
+            {
+                "name": "l1_user",
+                "type": "felt"
+            }
+        ],
+        "name": "create_l1_nft_message",
+        "outputs": [],
+        "type": "function"
+    }
+]
