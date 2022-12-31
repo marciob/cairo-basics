@@ -1,0 +1,150 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/m/Desktop/dev/web3/cairo/starknet-messaging-bridge/ex03/contracts/ConsumerEx3FromL2.sol": {
+      "lastModificationDate": 1669656861041,
+      "contentHash": "6c5b57c4c3ba2e5da9e6b19f7c871d4b",
+      "sourceName": "contracts/ConsumerEx3FromL2.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IStarknetCore.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "ConsumerEx3FromL2"
+      ]
+    },
+    "/Users/m/Desktop/dev/web3/cairo/starknet-messaging-bridge/ex03/contracts/interfaces/IStarknetCore.sol": {
+      "lastModificationDate": 1669442685974,
+      "contentHash": "2177d7581807fbbe4a0934fbdb0d9575",
+      "sourceName": "contracts/interfaces/IStarknetCore.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "IStarknetCore"
+      ]
+    },
+    "/Users/m/Desktop/dev/web3/cairo/starknet-messaging-bridge/ex03/node_modules/@openzeppelin/contracts/access/Ownable.sol": {
+      "lastModificationDate": 1669442357483,
+      "contentHash": "e436cea06129be2c73cda4b1acc848b5",
+      "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "/Users/m/Desktop/dev/web3/cairo/starknet-messaging-bridge/ex03/node_modules/@openzeppelin/contracts/utils/Context.sol": {
+      "lastModificationDate": 1669442357467,
+      "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    }
+  }
+}

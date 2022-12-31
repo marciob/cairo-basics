@@ -1,0 +1,29 @@
+[
+    {
+        "inputs": [],
+        "name": "l1_assigned_var",
+        "outputs": [
+            {
+                "name": "assigned_var",
+                "type": "felt"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "from_address",
+                "type": "felt"
+            },
+            {
+                "name": "rand_value",
+                "type": "felt"
+            }
+        ],
+        "name": "ex4",
+        "outputs": [],
+        "type": "l1_handler"
+    }
+]
