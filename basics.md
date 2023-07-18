@@ -309,6 +309,7 @@ fn main() {
 #### tuples
 
 it's a way to group multiple values into a compound type.<br>
+it can have different types.<br>
 it has fixed length, which means that once declared, it can't be changed. <br>
 
 ##### how to declare a tuple
@@ -482,7 +483,7 @@ fn main() {
 #### --available-gas
 
 it's a flag used to specify the amount of gas available to the program.<br>
-it's used to prevent infinite loops.<br>
+it's used to prevent infinite loops, in those cases it's mandatory to use this flag, otherwise the program will throw an error.<br>
 
 ex.:
 
@@ -508,3 +509,519 @@ fn main() {
     }
 }
 ```
+
+#### continue
+
+it's used to pause the current loop and continue in the next loop iteration.<br>
+ex.:
+
+```rs
+use debug::PrintTrait;
+fn main() {
+    let mut i: usize = 0;
+    loop {
+        if i > 10 {
+            break;
+        }
+        if i == 5 {
+            i += 1;
+
+            // when reach here it will stop the current loop and continue in the next loop iteration
+            continue;
+        }
+        i.print();
+        i += 1;
+    }
+}
+```
+
+#### common collections
+
+Cairo1 has 2 types of collections: <br>
+
+- Arrays
+- Felt252Dict
+
+#### arrays
+
+in Cairo, arrays are a collection of elements of the same type.<br>
+you need to import the array module to use it: array::ArrayTrait.<br>
+you can only append elements to the end of the array.<br>
+you can only remove elements from the front of the array.<br>
+
+#### creating an array
+
+it's made by calling `ArrayTrait::new()` <br>
+
+ex.:
+
+```rs
+use array::ArrayTrait;
+
+fn main() {
+    let mut a = ArrayTrait::new();
+    a.append(0);
+    a.append(1);
+    a.append(2);
+}
+```
+
+ex. of creating an array with a specified type:
+
+```rs
+let mut arr = ArrayTrait::<u128>::new();
+```
+
+#### updating an array
+
+To add an element to the end of an array, you can use the append() method:<br>
+
+```rs
+    a.append(0);
+```
+
+#### removing elements from an array
+
+you can only remove elements from the front of the array, using the `pop_front()` method.<br>
+`pop_front()` returns an `Option` containing the element removed, or `None` if the array is empty.<br>
+since an array is in an immutable memory, actually it doesn't remove the element of the array, it creates a new array starting from the second element of the original array. The original array is still in memory.<b
+
+```rs
+use option::OptionTrait;
+use array::ArrayTrait;
+use debug::PrintTrait;
+
+fn main() {
+    let mut a = ArrayTrait::new();
+    a.append(10);
+    a.append(1);
+    a.append(2);
+
+    let first_value = a.pop_front().unwrap();
+    first_value.print(); // print '10'
+}
+```
+
+#### removing elements from an array
+
+to access an element of an array, you can use the `get()` or `at()` methods.<br>
+`arr.at()` is similar to `arr[index]` in other languages.<br>
+
+- `at()` returns the element at the specified index, or panics if the index is out of bounds.<br>
+- `get()` returns an `Option` containing the element at the specified index, or `None` if the index is out of bounds.<br>
+
+difference between `get()` and `at()`:<br>
+
+- `at()` will panic if the index is out of bounds.<br>
+- `get()` will not panic if the index is out of bounds, it will return `None` instead.<br>
+
+ex. with `at()`:
+
+```rs
+use array::ArrayTrait;
+fn main() {
+    let mut a = ArrayTrait::new();
+    a.append(0);
+    a.append(1);
+
+    // * is the dereference operator
+    // it's used to get the value of the pointer instead of the pointer itself
+    // in this case, it's used to get the value of the pointer returned by the at() method
+    let first = *a.at(0);
+    let second = *a.at(1);
+}
+```
+
+ex. with `get()`:
+
+```rs
+use array::ArrayTrait;
+use box::BoxTrait;
+fn main() -> u128 {
+    let mut arr = ArrayTrait::<u128>::new();
+    arr.append(100);
+    let index_to_access =
+        1; // Change this value to see different results, what would happen if the index doesn't exist?
+    match arr.get(index_to_access) {
+        Option::Some(x) => {
+            *x.unbox()
+        // Don't worry about * for now, if you are curious see Chapter 3.2 #desnap operator
+        // It basically means "transform what get(idx) returned into a real value"
+        },
+        Option::None(_) => {
+            let mut data = ArrayTrait::new();
+            data.append('out of bounds');
+            panic(data)
+        }
+    }
+}
+```
+
+#### len()
+
+it's a method that returns the length of the array.<br>
+the return type is a `usize`.<br>
+
+#### is_empty()
+
+it checks if the array is empty.<br>
+it's a method that returns a boolean value, true if the array is empty, false if it's not.<br>
+
+#### storing multiple types in an array with enums
+
+ex.:
+
+```rs
+use array::ArrayTrait;
+use traits::Into;
+
+#[derive(Copy, Drop)]
+enum Data {
+    Integer: u128,
+    Felt: felt252,
+    Tuple: (u32, u32),
+}
+
+fn main() {
+    let mut messages: Array<Data> = ArrayTrait::new();
+    messages.append(Data::Integer(100));
+    messages.append(Data::Felt('hello world'));
+    messages.append(Data::Tuple((10, 30)));
+}
+```
+
+#### span()
+
+it represents a snapshot of the array.<br>
+it provides a safe way to access the array without about modifying the original array.<br>
+
+ex.:
+
+```rs
+use array::ArrayTrait;
+
+fn main() {
+    let mut array: Array<u8> = ArrayTrait::new();
+    array.span();
+}
+```
+
+#### ownership
+
+each variable in Cairo has an owner.<br>
+there can be only 1 owner at a time.<br>
+when the owner goes out of scope, the value will be dropped and removed from meory.<br>
+an owner of the variable is the scope in which the variable was declared.<br>
+the variable is the owner of the value it's holding.<br>
+
+ex.:
+
+```rs
+use debug::PrintTrait;
+
+fn main() {
+    // main() is the owner of the variable s
+    let s = 'hello'; // s is the owner of the value 'hello'
+    s.print(); // prints 'hello'
+} // s goes out of scope here, and 'hello' is dropped
+```
+
+#### ownership in array
+
+ex.:
+
+```rs
+use array::ArrayTrait;
+// some function created to exemplify the use of an array as a parameter
+fn foo(arr: Array<u128>) {}
+
+// some function created to exemplify the use of an array as a parameter
+fn bar(arr: Array<u128>) {}
+
+fn main() {
+    // an instance of arr is created here
+    let mut arr = ArrayTrait::<u128>::new();
+
+    // the arr instance is used for the first time here
+    foo(arr);
+
+    // the same arr instance is used for the second time here,
+    // it would be a tentative to write to the same memory location twice, which is not allowed in Cairo
+    // it will throw an error
+    bar(arr);
+}
+
+```
+
+#### copy
+
+`#[derive(Copy)]` is used to indicate that a type is safe to be copied.<br>
+this is used to avoid the error of trying to use the same instance twice.<br>
+Arrays and Dictioanries can not be copied, only custom types that don't contain either of them.<br>
+
+ex.:
+
+```rs
+#[derive(Copy, Drop)] // this indicates that the type is safe to be copied
+struct Point {
+    x: u128,
+    y: u128,
+}
+
+fn main() {
+    // p1 is an instance of Point
+    let p1 = Point { x: 5, y: 10 };
+
+    // here when passing p1, actually it's passing a copy of p1
+    // the ownership of p1 is not transferred to foo, it remains in main
+    // if `#[derive(Copy, Drop)]` was removed, it would throw an error
+    foo(p1);
+
+    // here it's another copy of p1
+    foo(p1);
+}
+
+fn foo(p: Point) { // do something with p
+}
+```
+
+#### drop
+
+`#[derive(Drop)]` is used to indicate that a type is safe to be dropped or deallocated (kind of transferred to another scope).<br>
+it handles the deallocation of the memory, any necessary cleanup.<br>
+it doesn't transfer the ownership of the variable, it just deallocates the memory.<br>
+
+ex.:
+
+the following code throws an error because A is used outside of its scope:
+
+```rs
+struct A {}
+
+fn main() {
+    A {}; // error: Value not dropped.
+}
+```
+
+the following code doesn't throw an error because A is safe to be used outside of its scope:
+
+```rs
+#[derive(Drop)]
+struct A {}
+
+fn main() {
+    A {}; // Now there is no error.
+}
+```
+
+#### clone
+
+`clone` is used to create a copy of a value.<br>
+
+ex.:
+
+```rs
+use array::ArrayTrait;
+use clone::Clone;
+use array::ArrayTCloneImpl;
+fn main() {
+    let arr1 = ArrayTrait::<u128>::new();
+    let arr2 = arr1.clone(); // arr2 is a copy of arr1
+}
+```
+
+### uint automatically has the Copy trait
+
+unsigned integers are automatically copied, so it's not necessary to use `#[derive(Copy)]` for them.<br>
+
+ex.:
+
+```rs
+#[derive(Drop)]
+struct MyStruct{} // MyStruct is safe to be dropped
+
+fn main() {
+    let my_struct = MyStruct{};  // my_struct comes into scope
+
+    takes_ownership(my_struct);     // my_struct's value moves into the function...
+                                    // ... and so is no longer valid here
+
+    let x = 5;                 // x comes into scope
+
+    makes_copy(x);                  // x would move into the function,
+                                    // but u128 implements Copy, so it is okay to still
+                                    // use x afterward
+
+}                                   // Here, x goes out of scope and is dropped.
+
+fn takes_ownership(some_struct: MyStruct) { // some_struct comes into scope
+} // Here, some_struct goes out of scope and `drop` is called.
+
+fn makes_copy(some_uinteger: u128) { // some_uinteger comes into scope
+} // Here, some_integer goes out of scope and is dropped.
+```
+
+#### return values transfer ownership
+
+when a value is returned from a function, it transfers the ownership of the value to the location where the function was called.<br>
+
+ex.:
+
+```rs
+#[derive(Drop)]
+struct A {}
+
+fn main() {
+    let a1 = gives_ownership();           // gives_ownership moves its return
+                                          // value into a1
+
+    let a2 = A {};                        // a2 comes into scope
+
+    let a3 = takes_and_gives_back(a2);    // a2 is moved into
+                                          // takes_and_gives_back, which also
+                                          // moves its return value into a3
+
+} // Here, a3 goes out of scope and is dropped. a2 was moved, so nothing
+  // happens. a1 goes out of scope and is dropped.
+
+fn gives_ownership() -> A {               // gives_ownership will move its
+                                          // return value into the function
+                                          // that calls it
+
+    let some_a = A {};                    // some_a comes into scope
+
+    some_a                                // some_a is returned and
+                                          // moves ownership to the calling
+                                          // function
+}
+
+// This function takes an instance some_a of A and returns it
+fn takes_and_gives_back(some_a: A) -> A { // some_a comes into
+                                          // scope
+
+    some_a                               // some_a is returned and moves
+                                         // ownership to the calling
+                                         // function
+}
+```
+
+#### snapshot @
+
+it's a way of getting an immutable view of a value at a certain point in time.<br>
+it allows ongoing use without transferring ownership.<br>
+it's only possible to use snaphot with types that implement it, such as ArrayTrait.<br>
+it uses @ to indicate that it's a snapshot.<br>
+it doesn't transfer ownership of the value, it just creates a snapshot of the value.<br>
+when functions have snapshots as parameters instead of the actual values, we won’t need to return the values in order to give back ownership of the original value, because we never had it.<br>
+
+ex.:
+
+```rs
+use array::ArrayTrait;
+use debug::PrintTrait;
+
+fn main() {
+    let mut arr1 = ArrayTrait::<u128>::new();
+    let first_snapshot = @arr1; // Take a snapshot of `arr1` at this point in time
+    arr1.append(1); // Mutate `arr1` by appending a value
+    let first_length = calculate_length(
+        first_snapshot
+    ); // Calculate the length of the array when the snapshot was taken
+    let second_length = calculate_length(@arr1); // Calculate the current length of the array
+    first_length.print();
+    second_length.print();
+}
+
+fn calculate_length(arr: @Array<u128>) -> usize {
+    arr.len()
+}
+```
+
+#### \*
+
+besides being used to multiply, it's also used to convert snapshots into their original values, as long as the value is copiable (which isn't the case for arrays)<br>
+
+ex.:
+
+```rs
+use debug::PrintTrait;
+
+#[derive(Copy, Drop)]
+struct Rectangle {
+    height: u64,
+    width: u64,
+}
+
+fn main() {
+    let rec = Rectangle { height: 3, width: 10 };
+    let area = calculate_area(@rec);
+    area.print();
+}
+
+fn calculate_area(rec: @Rectangle) -> u64 {
+    // As rec is a snapshot to a Rectangle, its fields are also snapshots of the fields types.
+    // We need to transform the snapshots back into values using the desnap operator `*`.
+    // This is only possible if the type is copyable, which is the case for u64.
+    // Here, `*` is used for both multiplying the height and width and for desnapping the snapshots.
+    *rec.height * *rec.width
+}
+```
+
+#### snapshot values can not be modified, by default
+
+the following code throws an error because the snapshot value can not be modified:
+
+```rs
+#[derive(Copy, Drop)]
+struct Rectangle {
+    height: u64,
+    width: u64,
+}
+
+fn main() {
+    let rec = Rectangle { height: 3, width: 10 };
+    flip(@rec);
+}
+
+fn flip(rec: @Rectangle) {
+    let temp = rec.height;
+    rec.height = rec.width;
+    rec.width = temp;
+}
+```
+
+#### snapshot values can be modified using the `mut` and `ref` keyword
+
+the `ref` keyword means reference, it's used to indicate that the value is a reference to the original value and can be modified.<br>
+eventual value returned doesn't transfer ownership.<br>
+
+ex.:
+
+```rs
+use debug::PrintTrait;
+#[derive(Copy, Drop)]
+struct Rectangle {
+    height: u64,
+    width: u64,
+}
+
+fn main() {
+    let mut rec = Rectangle { height: 3, width: 10 };
+    flip(ref rec);
+    rec.height.print();
+    rec.width.print();
+}
+
+fn flip(ref rec: Rectangle) {
+    let temp = rec.height;
+    rec.height = rec.width;
+    rec.width = temp;
+}
+```
+
+#### when to use snapshot or reference
+
+- snapshot: when you want to use the value without modifying it.<br>
+- reference: when you want to use the value and modify it.<br>
+
+Option
