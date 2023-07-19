@@ -311,6 +311,8 @@ fn main() {
 it's a way to group multiple values into a compound type.<br>
 it can have different types.<br>
 it has fixed length, which means that once declared, it can't be changed. <br>
+it might have or not a name for each value.<br>
+it need to be used in the same order that it was declared.<br>
 
 ##### how to declare a tuple
 
@@ -348,6 +350,103 @@ ex. declaring the tuple and destructuring in the same line:
 ```rs
 fn main() {
     let (x, y): (felt252, felt252) = (2, 3);
+}
+```
+
+#### structs
+
+it's a way to group multiple values into a compound type.<br>
+it can have different types.<br>
+it needs to have a name for each value.<br>
+in this case it's a bit more complex than a tuple.<br>
+it doesn't need to be used in the same order that it was declared.<br>
+an entire struct can not be printed as a whole, it's necessary to print each value of the struct.<br>
+
+ex.:
+
+```rs
+#[derive(Copy, Drop)]
+struct User {
+    active: bool,
+    username: felt252,
+    email: felt252,
+    sign_in_count: u64,
+}
+
+fn main() {
+    let user1 = User {
+        active: true, username: 'someusername123', email: 'someone@example.com', sign_in_count: 1
+    };
+}
+```
+
+##### getting the values of a struct
+
+ex.:
+
+```rs
+user1.email;
+```
+
+##### updating the values of a struct
+
+the instance of the struct needs to be mutable.<br>
+the entire instance needs to be mutable, it's not possible to make only one field mutable.<br>
+
+ex.:
+
+```rs
+#[derive(Copy, Drop)]
+struct User {
+    active: bool,
+    username: felt252,
+    email: felt252,
+    sign_in_count: u64,
+}
+
+fn main() {
+    let mut user1 = User {
+        active: true, username: 'someusername123', email: 'someone@example.com', sign_in_count: 1
+    };
+    user1.email = 'anotheremail@example.com';
+}
+```
+
+##### returning a struct
+
+a struct can be returned from a function.<br>
+
+ex.:
+
+```rs
+#[derive(Copy, Drop)]
+struct User {
+    active: bool,
+    username: felt252,
+    email: felt252,
+    sign_in_count: u64,
+}
+
+fn main() {
+    fn build_user(email: felt252, username: felt252) -> User {
+        // the last expression of this function is the return value
+        User { active: true, username: username, email: email, sign_in_count: 1,  }
+    }
+}
+```
+
+#### shorthand for initializing structs
+
+when the name of the variable is the same as the name of the field, it's possible to use the shorthand.<br>
+
+ex.:
+
+```rs
+// in this example since the name of the variable is the same as the name of the field, it's possible to use the shorthand
+fn build_user_short(email: felt252, username: felt252) -> User {
+    // instead of email: email, it's possible to use email, which will be whatever is passed as the email parameter
+    // instead of username: username, it's possible to use username, which will be whatever is passed as the username parameter
+    User { active: true, username, email, sign_in_count: 1,  }
 }
 ```
 
