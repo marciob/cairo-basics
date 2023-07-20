@@ -1127,6 +1127,102 @@ fn flip(ref rec: Rectangle) {
 
 traits are a way to group methods that can be used on various types.<br>
 traits are similar to interfaces in other languages <br>
+a trait doesn't have a function body, it only has the function signature.<br>
 traits are used to define shared behavior in an abstract way <br>
+the trait is later one implemented by a type.<br>
+when we attach a trait to a type, is like we are attaching methods to be used by that type anytime.<br>
+
+ex. of creating a trait:
+
+```rs
+
+// this is a trait called RectangleTrait
+// it has a function signature called area that returns a u64
+// just that, functions in a trait don't have a function body, they are called methods
+// the self parameter is a reference to the instance that is implementing the trait
+trait RectangleTrait {
+    fn area(self: @Rectangle) -> u64;
+}
+
+```
+
+#### impl
+
+impl is used to implement a trait for a type.<br>
+each struct can have multiple impl blocks.<br>
+
+ex. of implementing a trait in a type:
+
+```rs
+
+// this implements a trait called RectangleTrait for a type called RectangleTrait
+// the name of the impl isn't used anywhere, it's just naming for readability and organization
+// the self parameter is a reference to the instance that is implementing the trait
+impl RectangleImpl of RectangleTrait {
+    fn area(self: @Rectangle) -> u64 {
+        (*self.width) * (*self.height)
+    }
+}
+```
+
+ex. of the full code:
+
+```rs
+use debug::PrintTrait;
+#[derive(Copy, Drop)]
+struct Rectangle {
+    width: u64,
+    height: u64,
+}
+
+trait RectangleTrait {
+    fn area(self: @Rectangle) -> u64;
+}
+
+impl RectangleImpl of RectangleTrait {
+    fn area(self: @Rectangle) -> u64 {
+        (*self.width) * (*self.height)
+    }
+}
+
+fn main() {
+    let rect1 = Rectangle { width: 30, height: 50,  };
+
+
+    rect1.area().print();
+}
+```
+
+#### acessing a method from a trait
+
+ex. of calling a method from the type that implements the trait:
+
+```rs
+struct Dog{}
+
+trait MakeSound{
+  fn bark(self: @Dog);
+  // ...
+}
+
+fn main(){
+  let dog = Dog{};
+
+  dog.bark();
+}
+```
+
+ex. of calling a method from a trait:
+
+```rs
+trait RectangleTrait {
+    fn square(size: u64) -> Rectangle;
+}
+
+fn main() {
+    // this calls the method square from the trait RectangleTrait
+    let square = RectangleTrait::square(3);
+}
+```
 
 Option
