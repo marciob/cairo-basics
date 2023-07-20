@@ -1123,4 +1123,10 @@ fn flip(ref rec: Rectangle) {
 - snapshot: when you want to use the value without modifying it.<br>
 - reference: when you want to use the value and modify it.<br>
 
+#### trait
+
+traits are a way to group methods that can be used on various types.<br>
+traits are similar to interfaces in other languages <br>
+traits are used to define shared behavior in an abstract way <br>
+
 Option
