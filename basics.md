@@ -1225,4 +1225,232 @@ fn main() {
 }
 ```
 
-Option
+#### enum
+
+it's a way to group multiple values (variant).<br>
+each variant has a type, differently from other languages.<br>
+the name convention is to use PascalCase for each variant.<br>
+
+ex.:
+
+```rs
+#[derive(Drop)]
+enum Direction {
+    North: (),
+    East: (),
+    South: (),
+    West: (),
+}
+```
+
+#### enum with custom types
+
+it's possible to create enums with variants with different types.<br>
+you can even use a struct or enum as a variant.<br>
+
+ex.:
+
+```rs
+#[derive(Drop)]
+enum Message {
+    Quit: (), // it has no data associated with it
+    Echo: felt252, // it's a single felt252
+    Move: (u128, u128), // it's a tuple with 2 u128
+}
+```
+
+#### enums with traits
+
+you can implement traits for enums.<br>
+
+ex.:
+
+```rs
+trait Processing {
+    fn process(self: Message);
+}
+
+impl ProcessingImpl of Processing {
+    fn process(self: Message) {
+        match self {
+            Message::Quit(()) => {
+                'quitting'.print();
+            },
+            Message::Echo(value) => {
+                value.print();
+            },
+            Message::Move((x, y)) => {
+                'moving'.print();
+            },
+        }
+    }
+}
+```
+
+how that would be used:
+
+```rs
+    let msg: Message = Message::Quit(());
+    msg.process();
+```
+
+#### Option
+
+it's a enum that is implemented in Cairo.<br>
+it needs to import the option module to use it: `option::OptionTrait`.<br>
+it represents an optional value, that can be either Some or None.<br>
+an Option can be either those 2 values:<br>
+
+- `Some: T` : it contains a value of type T <br>
+- `None: ()` : it doesn't contain a value <br>
+
+ex.:
+
+```rs
+use option::OptionTrait;
+
+enum Option<T> {
+    Some: T,
+    None: (),
+}
+```
+
+#### match
+
+it's a way to compare a value and execute code for the first match.<br>
+each match line is called an arm.<br>
+the `=>` indicates what code to execute when there is a match.<br>
+the order of the arms must be in the same order of the variants of the enum.<br>
+if the code is a bit large it's possible to use `{}` to create a block of code.<br>
+match needs to be exhaustive, it means that it needs to have a match for each possible value of the type, otherwise it will throw an error. So doesn't matter if it's an enum or an Option, it needs to have a match for each variant.<br>
+
+ex.:
+
+```rs
+enum Coin {
+    Penny: (),
+    Nickel: (),
+    Dime: (),
+    Quarter: (),
+}
+
+fn value_in_cents(coin: Coin) -> felt252 {
+    match coin {
+        Coin::Penny(_) => 1,
+        Coin::Nickel(_) => 5,
+        Coin::Dime(_) => 10,
+        Coin::Quarter(_) => 25,
+    }
+}
+```
+
+ex. of using `{}` to create a block of code:
+
+```rs
+fn value_in_cents(coin: Coin) -> felt252 {
+    match coin {
+        Coin::Penny(_) => {
+            ('Lucky penny!').print();
+            1
+        },
+        Coin::Nickel(_) => 5,
+        Coin::Dime(_) => 10,
+        Coin::Quarter(_) => 25,
+    }
+}
+```
+
+#### match with enum variants
+
+ex.:
+
+```rs
+#[derive(Drop)]
+enum UsState {
+    Alabama: (),
+    Alaska: (),
+}
+
+#[derive(Drop)]
+// in this example, only Quarter is a variant with a value
+enum Coin {
+    Penny: (),
+    Nickel: (),
+    Dime: (),
+    Quarter: (UsState, ),
+}
+
+// this implementation is necessary to print the enum UsState
+impl UsStatePrintImpl of PrintTrait<UsState> {
+    fn print(self: UsState) {
+        match self {
+            UsState::Alabama(_) => ('Alabama').print(),
+            UsState::Alaska(_) => ('Alaska').print(),
+        }
+    }
+}
+
+// within this function we are using a match with an enum variant that has a value
+fn value_in_cents(coin: Coin) -> felt252 {
+    match coin {
+        Coin::Penny(_) => 1,
+        Coin::Nickel(_) => 5,
+        Coin::Dime(_) => 10,
+        // in this variant, we use a variable called state to get the value of the variant Coin::Quarter
+        // when a coin matches Coin::Quarter, the value of the variant is assigned to the variable state
+        Coin::Quarter(state) => {
+            state.print();
+            25
+        },
+    }
+}
+```
+
+#### printing an enum
+
+to print an enum, it's necessary to implement the trait PrintTrait for the enum.<br>
+
+ex.:
+
+```rs
+impl UsStatePrintImpl of PrintTrait<UsState> {
+    fn print(self: UsState) {
+        match self {
+            UsState::Alabama(_) => ('Alabama').print(),
+            UsState::Alaska(_) => ('Alaska').print(),
+        }
+    }
+}
+```
+
+#### match with Option
+
+it's possible to use match with Option.<br>
+the match arm needs to have the same order of the Option trait.<br>
+it matches if there is a value or not.<br>
+
+ex.:
+
+```rs
+use option::OptionTrait;
+use debug::PrintTrait;
+
+fn plus_one(x: Option<u8>) -> Option<u8> {
+    // this matches if there is a value or not
+    // if there is a value, it adds 1 to the value
+    // if there is no value, it returns None
+    // the matches uses the same order of the Option trait
+    match x {
+        Option::Some(val) => Option::Some(val + 1),
+        Option::None(_) => Option::None(()),
+    }
+}
+
+fn main() {
+    let five: Option<u8> = Option::Some(5);
+    let six: Option<u8> = plus_one(five);
+    six.unwrap().print();
+    let none = plus_one(Option::None(()));
+    none.unwrap().print();
+}
+```
