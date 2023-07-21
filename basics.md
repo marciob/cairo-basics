@@ -1454,3 +1454,26 @@ fn main() {
     none.unwrap().print();
 }
 ```
+
+#### crates
+
+it's a way to organize code.<br>
+it's a tree of modules, it' has a root directory and a root module.<br>
+crate is the smallest amount of code that Cairo can compile.<br>
+
+#### cairo package
+
+it's a bunch of crates created with Scarb.toml that define how to build those crates.<br>
+
+#### creating a package with Scarb
+
+`scarb new <package_name>`<br>
+
+this will create a new package named `<package_name>` with the following structure:<br>
+
+```rs
+my_package/
+├── Scarb.toml // it's the package manager, it's like a package.json in javascript
+└── src // it's where all cairo files for the package will be stored
+    └── lib.cairo // it's the default root module of the crate
+```
