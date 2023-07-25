@@ -12,6 +12,7 @@ cairo-run --version
 
 it's like "impot" <br>
 allows to import items, like modules, functions, etc from another scope into the current scope.<br>
+in case of modules, it works as a shortcut to access the items inside the module.<br>
 
 ex.:<br>
 
@@ -23,6 +24,14 @@ use debug::PrintTrait;
 fn main() {
     'Hello, world!'.print();
 }
+```
+
+ex. of using `use` as a shortcut to access the items inside a module:
+
+```rs
+//  it brings Asparagus to the scope, so it can be used in the main function just by typing Asparagus
+use backyard::garden::vegetables::Asparagus;
+
 ```
 
 #### indentations
@@ -50,6 +59,77 @@ it compiles the project.<br>
 
 mod is used to declare a module.<br>
 a module is a collection of functions, constants, types, etc.<br>
+
+#### creating a new module or submodule
+
+it's possible to create within the crate root file (lib.cairo) or in a separate file (submodules).<br>
+
+ex. of creating a module in the crate root file (lib.cairo):<br>
+
+```rs
+mod my_module {
+    // code here
+}
+```
+
+ex. of creating a module in a separate file (src/vegetables.cairo):<br>
+
+```rs
+// vegetables.cairo
+// it creates a module called vegetables
+mod vegetables {
+    // code here
+}
+```
+
+ex. of using a submodule within the lib.cairo file:<br>
+
+```rs
+// it includes the code that it finds in src/garden.cairo
+mod garden;
+
+fn main() {
+    // ...
+}
+```
+
+#### nested modules
+
+it's possible to create nested modules.<br>
+
+ex.:
+
+```rs
+mod front_of_house {
+    mod hosting {
+        fn add_to_waitlist() {}
+
+        fn seat_at_table() {}
+    }
+
+    mod serving {
+        fn take_order() {}
+
+        fn serve_order() {}
+
+        fn take_payment() {}
+    }
+}
+```
+
+in that example it's structured like this:<br>
+
+```rs
+restaurant
+ └── front_of_house
+     ├── hosting
+     │   ├── add_to_waitlist
+     │   └── seat_at_table
+     └── serving
+         ├── take_order
+         ├── serve_order
+         └── take_payment
+```
 
 #### cairo-run <file_name>
 
@@ -1476,4 +1556,46 @@ my_package/
 ├── Scarb.toml // it's the package manager, it's like a package.json in javascript
 └── src // it's where all cairo files for the package will be stored
     └── lib.cairo // it's the default root module of the crate
+```
+
+#### paths
+
+in Cairo a path is used to locate a module.<br>
+it could be a relative path or an absolute path.<br>
+
+- absolute path:<br>
+  the path starts from the crate root. <br>
+  ex.:
+
+```rs
+    restaurant::front_of_house::hosting::add_to_waitlist();
+```
+
+- relative path:<br>
+  the path starts from the current module.<br>
+  ex.:
+  ```rs
+  front_of_house::hosting::add_to_waitlist();
+  ```
+
+#### super
+
+it's used to go to the parent of the current module.<br>
+it's used to go to one scope above.<br>
+it's like using `..` in the terminal.<br>
+
+ex.:
+
+```rs
+fn deliver_order() {}
+
+mod back_of_house {
+    fn fix_incorrect_order() {
+        cook_order();
+        // here it's using super to go scope above where deliver_order is defined
+        super::deliver_order();
+    }
+
+    fn cook_order() {}
+}
 ```
