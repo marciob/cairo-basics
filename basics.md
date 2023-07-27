@@ -34,6 +34,60 @@ use backyard::garden::vegetables::Asparagus;
 
 ```
 
+#### as
+
+it means "alias".<br>
+it allows to create an alias for a module.<br>
+
+ex:
+
+```rs
+use array::ArrayTrait as Arr;
+
+fn main() {
+    let mut arr = Arr::new(); // ArrayTrait was renamed to Arr
+    arr.append(1);
+}
+```
+
+#### importing multiple items from a module
+
+it's possible to import multiple items from a module.<br>
+
+ex.:
+
+```rs
+// Assuming we have a module called `shapes` with the structures `Square`, `Circle`, and `Triangle`.
+mod shapes {
+    #[derive(Drop)]
+    struct Square {
+        side: u32
+    }
+
+    #[derive(Drop)]
+    struct Circle {
+        radius: u32
+    }
+
+    #[derive(Drop)]
+    struct Triangle {
+        base: u32,
+        height: u32,
+    }
+}
+
+// We can import the structures `Square`, `Circle`, and `Triangle` from the `shapes` module like this:
+use shapes::{Square, Circle, Triangle};
+
+// Now we can directly use `Square`, `Circle`, and `Triangle` in our code.
+fn main() {
+    let sq = Square { side: 5 };
+    let cr = Circle { radius: 3 };
+    let tr = Triangle { base: 5, height: 2 };
+// ...
+}
+```
+
 #### indentations
 
 cairo uses 4 spaces for indentation, not tabs.<br>
@@ -1211,6 +1265,7 @@ a trait doesn't have a function body, it only has the function signature.<br>
 traits are used to define shared behavior in an abstract way <br>
 the trait is later one implemented by a type.<br>
 when we attach a trait to a type, is like we are attaching methods to be used by that type anytime.<br>
+a trait is defined in PascalCase.<br>
 
 ex. of creating a trait:
 
@@ -1302,6 +1357,70 @@ trait RectangleTrait {
 fn main() {
     // this calls the method square from the trait RectangleTrait
     let square = RectangleTrait::square(3);
+}
+```
+
+#### self
+
+self is a reference to the instance that is implementing the trait.<br>
+
+ex.:
+
+```rs
+struct Rectangle {
+    height: u64,
+    width: u64,
+}
+
+#[generate_trait]
+impl RectangleGeometry of RectangleGeometryTrait {
+    fn boundary(self: Rectangle) -> u64 {
+        2 * (self.height + self.width)
+    }
+    fn area(self: Rectangle) -> u64 {
+        self.height * self.width
+    }
+}
+
+fn main() {
+    let rect = Rectangle { height: 5, width: 10 }; // Rectangle instantiation
+
+    // First way, as a method on the struct instance
+    let area1 = rect.area();
+    // Second way, from the implementation
+    let area2 = RectangleGeometry::area(rect);
+    // Third way, from the trait
+    let area3 = ShapeGeometry::area(rect);
+
+    // `area1` has same value as `area2` and `area3`
+    area1.print();
+    area2.print();
+    area3.print();
+}
+
+```
+
+#### trait without a declaration #[generate_trait]
+
+it's possible to create a trait without a declaration, by simply using the `#[generate_trait]` attribute.<br>
+the implementation name needs to have a Trait suffix.<br>
+
+ex.:
+
+```rs
+struct Rectangle {
+    height: u64,
+    width: u64,
+}
+
+#[generate_trait]
+impl RectangleGeometry of RectangleGeometryTrait {
+    fn boundary(self: Rectangle) -> u64 {
+        2 * (self.height + self.width)
+    }
+    fn area(self: Rectangle) -> u64 {
+        self.height * self.width
+    }
 }
 ```
 
@@ -1597,5 +1716,89 @@ mod back_of_house {
     }
 
     fn cook_order() {}
+}
+```
+
+#### generic type <T>
+
+it's a way to define a type that can be used in multiple types.<br>
+it can be used when defining a function, struct, enum, etc.<br>
+
+ex.:
+
+```rs
+
+use array::ArrayTrait;
+
+// Specify generic type T between the angulars
+// it's a function that returns an Array of type T
+// it compares two arrays and returns the largest one
+// actually the following code will throw an error because it didn't implement the drop trait, but it's just to exemplify the use of generic types, the correct signature should be:
+// fn largest_list<T, impl TDrop: Drop<T>>(l1: Array<T>, l2: Array<T>) -> Array<T> {
+fn largest_list<T>(l1: Array<T>, l2: Array<T>) -> Array<T> {
+    if l1.len() > l2.len() {
+        l1
+    } else {
+        l2
+    }
+}
+
+fn main() {
+    let mut l1 = ArrayTrait::new();
+    let mut l2 = ArrayTrait::new();
+
+    l1.append(1);
+    l1.append(2);
+
+    l2.append(3);
+    l2.append(4);
+    l2.append(5);
+
+    // There is no need to specify the concrete type of T because
+    // it is inferred by the compiler
+    let l3 = largest_list(l1, l2);
+}
+```
+
+#### PartialOrd
+
+the PartialOrd is a trait that is implemented in Cairo to compare values.<br>
+
+ex.:
+
+```rs
+use array::ArrayTrait;
+
+// Given a list of T get the smallest one.
+// The PartialOrd trait implements comparison operations for T
+fn smallest_element<T, impl TPartialOrd: PartialOrd<T>>(list: @Array<T>) -> T {
+    // This represents the smallest element through the iteration
+    // Notice that we use the desnap (*) operator
+    let mut smallest = *list[0];
+
+    // The index we will use to move through the list
+    let mut index = 1;
+
+    // Iterate through the whole list storing the smallest
+    loop {
+        if index >= list.len() {
+            break smallest;
+        }
+        if *list[index] < smallest {
+            smallest = *list[index];
+        }
+        index = index + 1;
+    }
+}
+
+fn main() {
+    let mut list: Array<u8> = ArrayTrait::new();
+    list.append(5);
+    list.append(3);
+    list.append(10);
+
+    // We need to specify that we are passing a snapshot of `list` as an argument
+    let s = smallest_element(@list);
+    assert(s == 3, 0);
 }
 ```
