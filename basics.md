@@ -1802,3 +1802,74 @@ fn main() {
     assert(s == 3, 0);
 }
 ```
+
+#### tests
+
+tests are functions created to test real code (non-test code). <br>
+within the test function usually it assert if the result is the expected one.<br>
+for while, to run a test it is necessary to use cairo_project.toml. (while Scarb not implement that)<br>
+
+#### creating a test function
+
+for creating a test function, it's necessary to use the `#[test]` attribute in the line above the function.<br>
+in the same file non-test code can also exist, so it's mandatory to use the `#[test]` attribute to indicate that the function is a test.<br>
+
+ex.:<br>
+
+```rs
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert(result == 4, 'result is not 4');
+    }
+
+```
+
+content of cairo_project.toml:
+
+```rs
+[crate_roots]
+adder = "src"
+```
+
+#### running a test
+
+for running a test, it's necessary to use the `cairo-test` command.<br>
+it will run all tests in the project.<br>
+
+ex. of result when running a test:
+
+```rs
+// example of a test result
+$ cairo-test .
+running 1 tests // it tells how many tests are running
+test adder::lib::tests::it_works ... ok // it_works is the name of the test function, and ok means that it passed
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 filtered out; // it's a summary of the test
+```
+
+ex. of a test that fails:
+
+```rs
+
+// the test function
+    #[test]
+    fn another() {
+        let result = 2 + 2;
+        assert(result == 6, 'Make this test fail');
+    }
+
+// the result of running the test
+$ cairo-test .
+running 2 tests
+test adder::lib::tests::exploration ... ok
+test adder::lib::tests::another ... fail
+failures:
+    adder::lib::tests::another - panicked with [1725643816656041371866211894343434536761780588 ('Make this test fail'), ].
+Error: test result: FAILED. 1 passed; 1 failed; 0 ignored
+
+```
+
+#### cairo_project.toml
+
+it's a configuration file for vanilla Cairo project (not initiated with Scarb).<br>
+it's required to run cairo-test.<br>
