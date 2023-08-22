@@ -1832,6 +1832,11 @@ content of cairo_project.toml:
 adder = "src"
 ```
 
+#### cairo_project.toml
+
+it's a configuration file for vanilla Cairo project (not initiated with Scarb).<br>
+it's required to run cairo-test.<br>
+
 #### running a test
 
 for running a test, it's necessary to use the `cairo-test` command.<br>
@@ -1850,14 +1855,15 @@ test result: ok. 1 passed; 0 failed; 0 ignored; 0 filtered out; // it's a summar
 ex. of a test that fails:
 
 ```rs
-
 // the test function
     #[test]
     fn another() {
         let result = 2 + 2;
         assert(result == 6, 'Make this test fail');
     }
+```
 
+```rs
 // the result of running the test
 $ cairo-test .
 running 2 tests
@@ -1866,10 +1872,165 @@ test adder::lib::tests::another ... fail
 failures:
     adder::lib::tests::another - panicked with [1725643816656041371866211894343434536761780588 ('Make this test fail'), ].
 Error: test result: FAILED. 1 passed; 1 failed; 0 ignored
+```
+
+#### running a specific test function
+
+ex.:
+
+```rs
+cairo-test . -f test_name
+```
+
+#### assert
+
+it's a function that checks if the result is the expected one.<br>
+if the result is not the expected one, it will throw an error.<br>
+the text after the comma is the error message.<br>
+when it fails it will panic and show the error message.<br>
+it's used in tests.<br>
+
+ex.:
+
+```rs
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert(result == 4, 'result is not 4');
+    }
+```
+
+#### should_panic
+
+it's a function that checks if the code is handling the erros correctly.<br>
+it's used with `#[should_panic]` code bellow the `#[test]` attribute and above the function.<br>
+
+ex. of code:
+
+```rs
+use array::ArrayTrait;
+
+#[derive(Copy, Drop)]
+struct Guess {
+    value: u64,
+}
+
+trait GuessTrait {
+    fn new(value: u64) -> Guess;
+}
+
+impl GuessImpl of GuessTrait {
+    fn new(value: u64) -> Guess {
+        if value < 1 || value > 100 {
+            let mut data = ArrayTrait::new();
+            data.append('Guess must be >= 1 and <= 100');
+            panic(data);
+        }
+        Guess { value }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Guess;
+    use super::GuessTrait;
+
+    #[test]
+    #[should_panic]
+    fn greater_than_100() {
+        GuessTrait::new(200);
+    }
+}
 
 ```
 
-#### cairo_project.toml
+```rs
+// the result of running the test
+$ cairo-test .
+running 1 tests
+test adder::lib::tests::greater_than_100 ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 filtered out;
+```
 
-it's a configuration file for vanilla Cairo project (not initiated with Scarb).<br>
-it's required to run cairo-test.<br>
+#### #[ignore]
+
+` #[ignore]` is used to ignore a test.<br>
+
+ex.:
+
+```rs
+#[cfg(test)]
+mod tests {
+   #[test]
+   fn it_works() {
+       let result = 2 + 2;
+       assert(result == 4, 'result is not 4');
+   }
+
+   #[test]
+   #[ignore]
+   fn expensive_test() { // code that takes an hour to run
+   }
+}
+```
+
+#### #[cfg(test)]
+
+it's used when you wanna indicate that a code only should be compiled when running tests.<br>
+cfg stands for configuration, so it's like saying "only run this when it's called by test".<br>
+
+ex.:
+
+```rs
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        let result = 2 + 2;
+        assert(result == 4, 'result is not 4');
+    }
+}
+
+```
+
+#### macro
+
+macros are like shortcut in Cairo.<br>
+they are called `inline_macros`. <br>
+there are 2 types of macros in Cairo:<br>
+
+- `array![]` : it's used to create an array.<br>
+- `consteval_int!()`: it's used to enforce that an operation is done at compile time.<br>
+
+`array![]`:<br>
+
+creating an array without `array!`:<br>
+
+```rs
+    let mut arr = ArrayTrait::new();
+    arr.append(1);
+    arr.append(2);
+    arr.append(3);
+    arr.append(4);
+    arr.append(5);
+```
+
+creating an array with `array!`:<br>
+
+```rs
+    let mut arr = array![1, 2, 3, 4, 5];
+```
+
+`consteval_int!`:<br>
+
+example of using `consteval_int`:<br>
+
+```rs
+const a: felt252 = consteval_int!(2 * 2 * 2);
+```
+
+the compiler will interpret the code above as:<br>
+
+```rs
+const a: felt252 = 8;
+```
