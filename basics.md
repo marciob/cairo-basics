@@ -2083,7 +2083,7 @@ it must be annotated with `#[starknet::contract]`. <br>
 #### public functions
 
 can be called by anyone, inside or outside the contract. <br>
-in order to use a public function, it's necessary to define it in an interface. <br>
+in order to use a public function, it's necessary to define it in an interface or tag it with `#[external(v0)]`. <br>
 
 #### external functions
 
@@ -2199,3 +2199,85 @@ trait ISimpleStorage<TContractState> {
     fn get(self: @TContractState) -> u128;
 }
 ```
+
+#### storage
+
+#### #[storage]
+
+storage variables are stored in the contract's state. <br>
+it needs to be stored in a struct called `Storage`. <br>
+it needs to use `LegacyMap` to store a map. <br>
+
+ex.:
+
+```rs
+
+    #[storage]
+    struct Storage {
+        id: u8,
+        names: LegacyMap::<ContractAddress, felt252>,
+    }
+
+```
+
+#### mappings
+
+it allows to store a value for a given key. <br>
+they are like hash tables in other languages. <br>
+
+#### LegacyMap
+
+it's a type used for storage. <br>
+it's used within `Storage` struct marked with `#[storage]` notation. <br>
+technically it's a hash table used to link a key to a value. <br>
+it's only valid within `Storage` struct, it can not be used in user-defined structs. <br>
+it also supports complex mappings, like tuples. <br>
+key and value pairs are accessed and modified using the `read` and `write` methods. <br>
+
+ex.:
+
+```rs
+    #[storage]
+    struct Storage {
+        user_data: LegacyMap::<ContractAddress, felt252>,
+    }
+```
+
+#### read
+
+it's a method used to read a value from a mapping. <br>
+it's part of the `LegacyMap` type. <br>
+
+#### write
+
+it's a method used to write a value to a mapping. <br>
+it's part of the `LegacyMap` type. <br>
+
+#### storing custom structs
+
+#### starknet::Store
+
+#### #[derive()]
+
+to store a custom struct, it's necessary to use the `starknet::Store` trait. <br>
+the compiler knows how to storage basic types, like u8, u128, u256, felt252, ContractAddress, etc, but for customs structs it's necessary to explicitly tell the compiler how to store it. <br>
+the trait `starknet::Store` is used to tell the compiler how to store a custom struct. <br>
+the `#[derive()]` attribute is used to derive the `starknet::Store` trait. <br>
+
+ex.:
+
+```rs
+    // the derive tells the compiler to derive the traits Copy, Drop, Serde and starknet::Store
+    // starknet::Store is necessary to store the struct in the contract state
+    #[derive(Copy, Drop, Serde, starknet::Store)]
+    struct Person {
+        name: felt252,
+        address: ContractAddress
+    }
+```
+
+#### derive
+
+in Rust, like similar in Cairo, the `#[derive()]` attribute is is a procedural macro that facilitates automatic trait implementations for data structures like structs or enums. <br>
+it's used to automatically implement traits for a data struct, like structs and enums. <br>
+instead of implementing the trait manually, the `#[derive()]` attribute tells the compiler to automatically implement it. <br>
