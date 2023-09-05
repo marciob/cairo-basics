@@ -2248,10 +2248,36 @@ ex.:
 it's a method used to read a value from a mapping. <br>
 it's part of the `LegacyMap` type. <br>
 
+ex.: <br>
+
+```rs
+    #[storage]
+    struct Storage {
+        id: u8,
+        names: LegacyMap::<ContractAddress, felt252>,
+    }
+
+    // it reads the value from a variable names passing the address as a key parameter
+    // if the variable storage doesn't store a mapping, it can be accessed without passing a key parameter
+    let name = self.names.read(address);
+```
+
 #### write
 
 it's a method used to write a value to a mapping. <br>
 it's part of the `LegacyMap` type. <br>
+
+ex.:
+
+```rs
+    #[storage]
+    struct Storage {
+        id: u8,
+        names: LegacyMap::<ContractAddress, felt252>,
+    }
+
+    self.names.write(user, name);
+```
 
 #### storing custom structs
 
