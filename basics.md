@@ -2089,6 +2089,8 @@ in order to use a public function, it's necessary to define it in an interface o
 
 it's a public function that can be invoked by a transaction and can mutate the state. <br>
 it needs to be annotated with the #[external(v0)] attribute. <br>
+it can modify the contract's state. <br>
+`ref self: ContractState` is a reference to the current state of the contract. <br>
 
 ex.:
 
@@ -2307,3 +2309,46 @@ ex.:
 in Rust, like similar in Cairo, the `#[derive()]` attribute is is a procedural macro that facilitates automatic trait implementations for data structures like structs or enums. <br>
 it's used to automatically implement traits for a data struct, like structs and enums. <br>
 instead of implementing the trait manually, the `#[derive()]` attribute tells the compiler to automatically implement it. <br>
+
+#### constructor
+
+#### #[constructor]
+
+it's code to be executed when the contract is deployed. <br>
+it uses the `#[constructor]` attribute. <br>
+it can be used to initialize the contract state. <br>
+it can only have one constructor per contract. <br>
+
+ex.:
+
+```rs
+    #[constructor]
+    fn constructor(ref self: ContractState, owner: Person) {
+        self.names.write(owner.address, owner.name);
+        self.total_names.write(1);
+        self.owner.write(owner);
+    }
+```
+
+#### private function (or internal function)
+
+it's a function not market as `#[external(v0)]`. <br>
+it can be accessed only by other functions within the contract. <br>
+in solidity, there is difference between private and internal functions, but in Cairo they are the same. <br>
+you should use `#[generate_trait]` to generate a trait for the internal functions, it's necessary to have access to the state of the contract. <br>
+if you don't need access to the state of the contract, you can remove `#[generate_trait]`. <br>
+
+ex.:
+
+```rs
+    #[generate_trait]
+    impl InternalFunctions of InternalFunctionsTrait {
+        fn _store_name(ref self: ContractState, user: ContractAddress, name: felt252) {
+            let mut total_names = self.total_names.read();
+            self.names.write(user, name);
+            self.total_names.write(total_names + 1);
+            self.emit(Event::StoredName(StoredName { user: user, name: name }));
+
+        }
+    }
+```
