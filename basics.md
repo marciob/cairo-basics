@@ -2352,3 +2352,48 @@ ex.:
         }
     }
 ```
+
+#### events
+
+they are custom structs that are emitted by the contract during execution. <br>
+it's used to communicate with the outside world by logging events. <br>
+
+#### creating an event
+
+all events must be defined in an Event enum. <br>
+each variant of the enum represents an event. <br>
+each event must have a struct that represents the data structure of the event. <br>
+the event struct must be marked with the `#[derive(Drop, starknet::Event)]` attribute. <br>
+the `#[key]` is used to index the key, it indicates the key of the event. <br>
+
+ex.:
+
+```rs
+    #[event] // it's an attribute that indicates that the struct is an event
+    #[derive(Drop, starknet::Event)] // tells the compiler to derive the traits Drop and starknet::Event
+    enum Event {
+        StoredName: StoredName,
+    }
+
+    // it represents the data structure of the event
+    #[derive(Drop, starknet::Event)]
+    struct StoredName {
+        #[key]
+        user: ContractAddress,
+        name: felt252
+    }
+```
+
+#### emitting an event
+
+after defining an event, it's possible to emit it using `self.emit()` method. <br>
+when `self.emit()` is called, it will emit the event to the outside world. <br>
+
+ex.:
+
+```rs
+    // in this example Event::StoredName is specifing the StoredName variant of the Event enum
+    // StoredName { user: some_user_address, name: some_name_value } is how to instantiate the StoredName struct
+    // so with StoredName { user: some_user_address, name: some_name_value } it's creating a new StoredName struct with specified values
+    self.emit(Event::StoredName(StoredName { user: some_user_address, name: some_name_value }));
+```
