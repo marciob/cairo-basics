@@ -1223,6 +1223,10 @@ fn flip(rec: @Rectangle) {
 }
 ```
 
+#### ref
+
+#### mut
+
 #### snapshot values can be modified using the `mut` and `ref` keyword
 
 the `ref` keyword means reference, it's used to indicate that the value is a reference to the original value and can be modified.<br>
@@ -2034,3 +2038,123 @@ the compiler will interpret the code above as:<br>
 ```rs
 const a: felt252 = 8;
 ```
+
+#### the blockchin trilemma
+
+- decentralization
+- security
+- scalability
+
+#### layers 2
+
+they try to solve the trilemma by moving some of the computation off-chain and saving only the results on-chain. <br>
+
+two main types of layer 2 solutions: <br>
+
+- optimistic rollups
+- validity rollups
+
+#### optimistic rollups
+
+a new state is considered valid by default, unless proven otherwise. <br
+there is a 7 day challenge period, during which nodes can prove that the new state is invalid. <br>
+ex.: <br>
+`Optimism`
+
+#### validity rollups
+
+uses cryptographic proofs to prove that the new state is valid. <br>
+ex.: <br>
+`Starknet`
+
+#### Cairo programs
+
+Cairo is a language developed to work with STARKS in a general way. <br>
+with Cairo it's possible to write provable code. <br>
+a general program in Cairo is called a `Cairo program`. <br>
+a Cairo program must always have a `main` function. <br>
+
+#### Cairo smart contracts
+
+Cairo smart contracts are Cairo programs that are deployed and run on the Starknet blockchain. <br>
+a Cairo smart contract has access to Starknet's state. <br>
+it must be annotated with `#[starknet::contract]`. <br>
+
+#### public functions
+
+can be called by anyone, inside or outside the contract. <br>
+in order to use a public function, it's necessary to define it in an interface. <br>
+
+#### external functions
+
+it's a public function that can be invoked by a transaction and can mutate the state. <br>
+it needs to be annotated with the #[external(v0)] attribute. <br>
+
+ex.:
+
+```rs
+    #[external(v0)]
+    impl SimpleStorage of super::ISimpleStorage<ContractState> {
+        fn set(ref self: ContractState, x: u128) {
+            self.stored_data.write(x);
+        }
+        fn get(self: @ContractState) -> u128 {
+            self.stored_data.read()
+        }
+    }
+```
+
+complete contract code:
+
+```rs
+#[starknet::interface]
+trait ISimpleStorage<TContractState> {
+    fn set(ref self: TContractState, x: u128);
+    fn get(self: @TContractState) -> u128;
+}
+
+#[starknet::contract]
+mod SimpleStorage {
+    use starknet::get_caller_address;
+    use starknet::ContractAddress;
+
+    #[storage]
+    struct Storage {
+        stored_data: u128
+    }
+
+    #[external(v0)]
+    impl SimpleStorage of super::ISimpleStorage<ContractState> {
+        fn set(ref self: ContractState, x: u128) {
+            self.stored_data.write(x);
+        }
+        fn get(self: @ContractState) -> u128 {
+            self.stored_data.read()
+        }
+    }
+}
+```
+
+#### #[external(v0)]
+
+it's an attribute that indicates that the function is an external function. <br>
+it exposures the function to the outside world. <br>
+all functions defined in a block with the #[external(v0)] attribute are public functions. <br>
+
+#### view functions
+
+it can be called inside or outside the contract, but it can't mutate the state. <br>
+
+#### ContractState
+
+it represents the current state of the contract. <br>
+it's generated automatically by the compiler. <br>
+it provides access to the contract's storage variables defined in the Storage struct. <br>
+it's used to emit events within the contract. <br>
+functions needing to access the contract state use `self: ContractState` as a parameter. <br>
+
+#### TContractState
+
+it's a generic type that represents the contract state. <br>
+all functions that need to access the contract state needs to use `self: TContractState` as a parameter. <br>
+it serves as a mechanism to ensure contract functions adhere to state access rules. <br>
